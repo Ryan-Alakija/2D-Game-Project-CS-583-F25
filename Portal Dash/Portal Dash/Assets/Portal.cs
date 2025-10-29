@@ -11,17 +11,12 @@ public class Portal : MonoBehaviour
     public bool isActive = true;                    //can this portal be used? (only if both portals are active)
 
     private bool playerIsOverlapping;
-    //private Collider playerInPortal;                //reference to player collider when in portal
 
     private const float EXIT_OFFSET = 2.0f;         //distance to offset player from exit portal upon teleporting
 
     [Header("Sound Effects")]
     [SerializeField] private AudioClip teleportSound;
     private AudioSource audioSource;
-
-    //teleport cooldown
-    //private HashSet<Collider> recentlyTeleported = new HashSet<Collider>();
-    //private const float REENTRY_COOLDOWN = 0.2f;    //seconds after teleport during which player cannot re-enter portal
 
     public void Awake()
     {
@@ -33,15 +28,12 @@ public class Portal : MonoBehaviour
 
     private void Teleport(Collider player)
     {
-        //if (recentlyTeleported.Contains(player))
-        //    return;     //player recently teleported, do not teleport again yet
-
-        Debug.Log("Telporting player...");
+        //Debug.Log("Telporting player...");
 
         Rigidbody rb = player.GetComponent<Rigidbody>();
 
         //TESTING: get current position right when player enters portal
-        Debug.Log("Enter position: " + rb.position);
+        //Debug.Log("Enter position: " + rb.position);
 
         if (rb == null) return;
 
@@ -50,21 +42,23 @@ public class Portal : MonoBehaviour
         Vector3 exitUp = linkedPortal.transform.up;
         Vector3 entryVelocity = rb.velocity;
 
-        Debug.Log("Entry Velocity: " + entryVelocity);
+        //Debug.Log("Entry Velocity: " + entryVelocity);
 
         //reorient velocity relative to portals
         Vector3 relativeVelocity = transform.InverseTransformDirection(entryVelocity);
 
-        Debug.Log("Relative Velocity: " + relativeVelocity);
+        //Debug.Log("Relative Velocity: " + relativeVelocity);
 
         Vector3 newVelocity = linkedPortal.transform.TransformDirection(relativeVelocity);
-        Debug.Log("Relative velocity to exit portal: " + newVelocity);
+        //Debug.Log("Relative velocity to exit portal: " + newVelocity);
 
-        //check if exit portal is pointing horizontally or vertically,
-        //and flip either the x or y component of the new direction accordingly;
-        //note that only the x or y component of exitUp will be non-zero
-        Debug.Log("exitUp: " + exitUp);
-        //if portal is pointing horizontally
+        //Debug.Log("exitUp: " + exitUp);
+
+        /* check if exit portal is pointing horizontally or vertically,
+         * and flip either the x or y component of the new direction accordingly;
+         * note that only the x or y component of exitUp will be non-zero,
+         * if portal is pointing horizontally
+         */
         if (exitUp.x != 0f)
         {
             newVelocity.x *= -1;
@@ -78,7 +72,7 @@ public class Portal : MonoBehaviour
                 newVelocity.x = exitUp.x * newVelocity.magnitude;
             }
 
-            Debug.Log("Adjusted newVelocity.x: " + newVelocity.x);
+            //Debug.Log("Adjusted newVelocity.x: " + newVelocity.x);
 
             //set y velocity to zero for horizontal portals
             newVelocity.y = 0f;
@@ -103,19 +97,19 @@ public class Portal : MonoBehaviour
             }
         }
 
-        Debug.Log("New Velocity: " + newVelocity);
+        //Debug.Log("New Velocity: " + newVelocity);
 
         //teleport player's position
         //player.transform.position = linkedPortal.transform.position + exitUp * 2.8f;
         rb.position = linkedPortal.transform.position + exitUp * EXIT_OFFSET;
 
         //TESTING: get position after teleporting
-        Debug.Log("Exit position: " + rb.position);
+        //Debug.Log("Exit position: " + rb.position);
 
         //apply reoriented velocity
         rb.velocity = newVelocity;
 
-        Debug.Log("I'm goin this fast now: " + rb.velocity);
+        //Debug.Log("I'm goin this fast now: " + rb.velocity);
 
         player.GetComponent<PlayerMovement>().OnTeleported();
     }
